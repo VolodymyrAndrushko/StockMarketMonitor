@@ -1,0 +1,120 @@
+package com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vandrushko.feature_crypto_currency.R
+import com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen.components.CryptoCurrency
+import com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen.event.HomeScreenEvent
+import com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen.vm.HomeScreenViewModel
+
+@Composable
+fun FindCryptoField(
+    modifier: Modifier = Modifier,
+    viewModel: HomeScreenViewModel = viewModel(),
+) {
+    var query by remember { mutableStateOf("") }
+    val state by viewModel.state.collectAsState()
+    val currencies = state.findResultCurrencies
+
+    Row(modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = query,
+            onValueChange = { query = it },
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp),
+            placeholder = {
+                Text(
+                    stringResource(R.string.search_currency),
+                )
+            },
+            singleLine = true
+        )
+
+        if (query.isNotBlank() && currencies.isNotEmpty()) {
+            Dialog(onDismissRequest = { query = "" }) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.search_results),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(currencies) { currency ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    CryptoCurrency(
+                                        currency = currency,
+                                        onClick = { },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.emit(HomeScreenEvent.AddToFavourite(currency))
+                                        }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = stringResource(R.string.add_to_favourite),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        IconButton(
+            onClick = {
+                viewModel.emit(HomeScreenEvent.FindBySymbol(query))
+
+            }) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search currency",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}

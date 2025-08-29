@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">StockMarketMonitor</string>
+    <string name="main_menu">MainMenu</string>
+    <string name="settings">MainMenu</string>
+</resources>

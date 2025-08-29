@@ -1,0 +1,48 @@
+android {
+    compileSdk = 36
+
+    defaultConfig {
+        minSdk = 24
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+//    kotlin {
+//        jvmToolchain(11)
+//    }
+
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.bundles.ui)
+    debugImplementation(libs.bundles.uiDebug)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.bundles.androidTests)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    implementation(libs.coil.compose)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    implementation libs.androidx.lifecycle.viewmodel.compose
+    implementation(libs.bundles.ktor)
+    implementation(libs.kotlinx.serialization)
+
+    implementation(libs.room)
+    ksp(libs.roomCompiler)
+}
