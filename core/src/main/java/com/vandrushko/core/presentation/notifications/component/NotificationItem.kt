@@ -42,10 +42,10 @@ fun NotificationItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Text(
-                    text = "#${index + 1} • ${notification.message}",
+                    text = "${notification.id} • ${notification.message}",
                     fontWeight = if (notification.isViewed) FontWeight.Normal else FontWeight.Bold
                 )
                 Spacer(Modifier.height(4.dp))

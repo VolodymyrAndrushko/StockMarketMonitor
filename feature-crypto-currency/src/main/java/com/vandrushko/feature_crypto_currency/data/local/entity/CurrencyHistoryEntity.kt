@@ -1,25 +1,30 @@
 package com.vandrushko.feature_crypto_currency.data.local.entity
 
+
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.vandrushko.core.data.utils.doublePriceFormat
 import com.vandrushko.core.data.utils.doublePricePercentDiffFormat
 import com.vandrushko.core.data.utils.formatTimestampToHHMMSS
 import com.vandrushko.feature_crypto_currency.domain.model.Currency
 
-@Entity
-data class CurrencyEntity(
-    @PrimaryKey
+
+@Entity(
+    indices = [Index("symbol")]
+)
+data class CurrencyHistoryEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val symbol: String,
     val quoteVolume: Double,
+    val timestamp: Long,
+    val lastPrice: Double,
     val priceChangeLast: Double,
     val priceChangePercent: Double,
-    val lastPrice: Double,
     val lastUpdated: Long,
-    val isFavourite: Boolean = false
 )
 
-fun CurrencyEntity.toCurrency(): Currency = Currency(
+fun CurrencyHistoryEntity.toCurrency(): Currency = Currency(
     currencyName = symbol,
     currentPrice = lastPrice,
     currentPriceText = doublePriceFormat(lastPrice),
@@ -30,12 +35,3 @@ fun CurrencyEntity.toCurrency(): Currency = Currency(
     lastTimeUpdate = formatTimestampToHHMMSS(lastUpdated),
     timestamp = lastUpdated
 )
-
-fun CurrencyEntity.toCurrencyHistoryEntity(): CurrencyHistoryEntity =
-    CurrencyHistoryEntity(
-        symbol = symbol, timestamp = lastUpdated, lastPrice = lastPrice,
-        quoteVolume = quoteVolume,
-        priceChangeLast = priceChangeLast,
-        priceChangePercent = priceChangePercent,
-        lastUpdated = lastUpdated
-    )

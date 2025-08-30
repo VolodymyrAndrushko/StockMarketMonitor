@@ -25,7 +25,7 @@ fun StockMarketNavigationBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.secondary,
+        containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 28.dp,
         contentColor = MaterialTheme.colorScheme.primary,
     ) {

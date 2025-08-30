@@ -14,6 +14,7 @@ import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.GetAllTickerUseCase
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.GetFavouriteCurrenciesUseCase
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.MarkCurrencyAsFavouriteUseCase
+import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.RemoveCurrencyFromFavouriteUseCase
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.SubscribeMultipleCryptoCurrenciesUseCase
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.SubscribeToOneCurrencyUseCase
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.WatchCurrencyHistoryUseCase
@@ -108,4 +109,11 @@ object CryptoCurrencyModule {
         repository: CryptoCurrencyRepository
     ): SubscribeToOneCurrencyUseCase =
         SubscribeToOneCurrencyUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideRemoveCurrencyFromFavouriteUseCase(
+        repository: CryptoCurrencyRepository
+    ): RemoveCurrencyFromFavouriteUseCase =
+        RemoveCurrencyFromFavouriteUseCase(repository = repository)
 }

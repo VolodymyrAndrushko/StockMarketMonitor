@@ -112,7 +112,8 @@ private fun LineChartViewPreview() {
                     priceChangeLast = 22.23,
                     quoteVolume = 24.25,
                     lastTimeUpdate = "unum",
-                    timestamp = 4950
+                    timestamp = 4950,
+                    priceChangePercentText = "docendi"
                 )
             )
         )
@@ -127,9 +128,8 @@ private fun LineChartViewPreview() {
                     quoteVolume = 24.25,
                     lastTimeUpdate = "unum",
                     timestamp = 4950,
-
-
-                    )
+                    priceChangePercentText = "etiam",
+                )
             )
         )
     }

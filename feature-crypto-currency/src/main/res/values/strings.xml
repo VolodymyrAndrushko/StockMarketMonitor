@@ -5,6 +5,9 @@
     <string name="search_results">Search results</string>
     <string name="add_to_favourite">Add to favorites</string>
     <string name="last_five_minutes">Last 5 minutes</string>
+    <string name="last_update">Last update: %s</string>
     <string name="update_period">Update period: %d sec</string>
+    <string name="remove_from_favourite">Remove from favourite</string>
+    <string name="there_is_no_added_currencies_yet">There is no added currencies yet</string>
 
 </resources>

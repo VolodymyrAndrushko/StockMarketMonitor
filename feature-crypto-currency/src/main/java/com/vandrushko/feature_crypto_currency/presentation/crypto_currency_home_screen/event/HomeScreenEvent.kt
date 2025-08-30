@@ -6,4 +6,5 @@ sealed interface HomeScreenEvent {
     data class FindBySymbol(val symbol: String): HomeScreenEvent
     data class AddToFavourite(val currency: Currency): HomeScreenEvent
     object  EnterScreen: HomeScreenEvent
+    object  StopWatch: HomeScreenEvent
 }

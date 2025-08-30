@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vandrushko.core.domain.notifications.usecase.DeleteNotificationUseCase
 import com.vandrushko.core.domain.notifications.usecase.GetAllNotificationsUseCase
+import com.vandrushko.core.domain.notifications.usecase.NotificationAddedFlowUseCase
 import com.vandrushko.core.domain.notifications.usecase.SetNotificationAsViewedUseCase
 import com.vandrushko.core.presentation.notifications.event.NotificationsEvent
 import com.vandrushko.core.presentation.notifications.state.NotificationsState
@@ -20,17 +21,22 @@ class NotificationsViewModel @Inject constructor(
     private val deleteNotification: DeleteNotificationUseCase,
     private val setNotificationAsViewed: SetNotificationAsViewedUseCase,
     private val getAllNotifications: GetAllNotificationsUseCase,
+    notificationAddedFlow: NotificationAddedFlowUseCase,
 ) : ViewModel() {
 
     init {
         viewModelScope.launch {
             getAllNotifications().collectLatest { notifications ->
-                _state.update { it.copy(
-                    notifications = notifications
-                ) }
+                _state.update {
+                    it.copy(
+                        notifications = notifications
+                    )
+                }
             }
         }
     }
+
+    val onNewNotification = notificationAddedFlow()
     private val _state = MutableStateFlow(NotificationsState())
     val state = _state.asStateFlow()
 

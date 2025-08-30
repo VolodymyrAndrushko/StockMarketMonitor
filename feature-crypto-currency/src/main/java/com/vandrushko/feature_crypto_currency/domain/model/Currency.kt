@@ -8,6 +8,7 @@ data class Currency(
     val currentPriceText: String,
     val currentPrice: Double,
     val priceChangePercent: Double,
+    val priceChangePercentText: String,
     val priceChangeLast: Double,
     val quoteVolume: Double,
     val lastTimeUpdate: String,

@@ -13,18 +13,26 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vandrushko.core.data.utils.formatTimestampToHHMMSS
+import com.vandrushko.feature_crypto_currency.R
 import com.vandrushko.feature_crypto_currency.domain.model.Currency
 import java.text.DecimalFormat
 
 @Composable
-fun CryptoCurrency(currency: Currency,  modifier: Modifier = Modifier, onClick: (currency: Currency)-> Unit) {
+fun CryptoCurrency(
+    currency: Currency,
+    modifier: Modifier = Modifier,
+    onClick: (currency: Currency) -> Unit
+) {
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -46,7 +54,7 @@ fun CryptoCurrency(currency: Currency,  modifier: Modifier = Modifier, onClick: 
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Last update: ${currency.lastTimeUpdate}",
+                text = stringResource(R.string.last_update, currency.lastTimeUpdate),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -54,16 +62,17 @@ fun CryptoCurrency(currency: Currency,  modifier: Modifier = Modifier, onClick: 
 
         Column(horizontalAlignment = Alignment.End) {
             Text(
-                text = "$${currency.currentPrice}",
+                text = currency.currentPriceText,
                 style = MaterialTheme.typography.titleMedium
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            val changeColor = if (currency.priceChangePercent >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
+            val changeColor =
+                if (currency.priceChangePercent >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
 
             Text(
-                text = "${DecimalFormat("0.#####").format(currency.priceChangePercent)}%",
+                text = currency.priceChangePercentText,
                 style = MaterialTheme.typography.bodySmall,
                 color = changeColor
             )
@@ -74,15 +83,16 @@ fun CryptoCurrency(currency: Currency,  modifier: Modifier = Modifier, onClick: 
 @Preview
 @Composable
 private fun CryptoCurrencyPreview() {
-    CryptoCurrency(Currency(
-        currencyName = "Parker Kirk",
-        currentPriceText = "0.00000916",
-        currentPrice = 0.00000916,
-        priceChangePercent = 0.00003,
+    CryptoCurrency(
+        Currency(
+            currencyName = "Parker Kirk",
+            currentPriceText = "0.00000916",
+            currentPrice = 0.00000916,
+            priceChangePercent = 0.00003,
 //        priceChangePercent = 2.963917525773198,
-        priceChangeLast = 22.23,
-        quoteVolume = 24.25,
-        lastTimeUpdate = formatTimestampToHHMMSS(System.currentTimeMillis()),
-        timestamp = System.currentTimeMillis()
-    ), onClick = {})
+            priceChangeLast = 22.23,
+            quoteVolume = 24.25,
+            lastTimeUpdate = formatTimestampToHHMMSS(System.currentTimeMillis()),
+            timestamp = System.currentTimeMillis(), priceChangePercentText = "eum"
+        ), onClick = {})
 }

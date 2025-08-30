@@ -3,6 +3,7 @@ package com.vandrushko.feature_crypto_currency.presentation.detailed_graph.vm
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vandrushko.core.domain.settings.usecase.RefreshTimeStateUseCase
+import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.RemoveCurrencyFromFavouriteUseCase
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.SubscribeToOneCurrencyUseCase
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.WatchCurrencyHistoryUseCase
 import com.vandrushko.feature_crypto_currency.domain.model.Currency
@@ -22,7 +23,8 @@ import kotlinx.coroutines.launch
 class DetailedGraphViewModel @Inject constructor(
     private val watchCurrencyHistory: WatchCurrencyHistoryUseCase,
     private val subscribeToOneCurrency: SubscribeToOneCurrencyUseCase,
-    private val refreshTimeState: RefreshTimeStateUseCase
+    private val refreshTimeState: RefreshTimeStateUseCase,
+    private val removeCurrencyFromFavourite: RemoveCurrencyFromFavouriteUseCase,
 ) : ViewModel() {
 
     private var watchJob: Job? = null
@@ -35,7 +37,20 @@ class DetailedGraphViewModel @Inject constructor(
                 subscribeToCurrencyHistory(event.currency)
             }
 
+            is DetailedGraphEvent.EnterScreen -> {
+                _state.update {
+                    it.copy(currencies = listOf(), lastCurrency = null)
+                }
+            }
+
             is DetailedGraphEvent.StopWatch -> {
+                watchJob?.cancel()
+            }
+
+            is DetailedGraphEvent.RemoveFromFavourite -> {
+                viewModelScope.launch {
+                    removeCurrencyFromFavourite(event.currency)
+                }
             }
         }
     }
@@ -51,13 +66,13 @@ class DetailedGraphViewModel @Inject constructor(
         watchJob = viewModelScope.launch {
             watchCurrencyHistory(currency).sample(_state.value.updatePeriod.millis)
                 .collectLatest { currencies ->
-                    _state.update {
-                        it.copy(
-                            currencies = currencies,
-                            lastCurrency = currencies.maxBy { it.timestamp })
+                    if (currencies.isNotEmpty()) {
+                        _state.update {
+                            it.copy(
+                                currencies = currencies,
+                                lastCurrency = currencies.maxBy { it.timestamp })
+                        }
                     }
-                    println("ASDASDASD " + currencies.size)
-                    println("ASDASDASD " + _state.value.currencies.toString())
                 }
         }
     }

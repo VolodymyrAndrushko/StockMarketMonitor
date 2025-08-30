@@ -11,5 +11,6 @@ interface CryptoCurrencyRepository {
     suspend fun markCurrencyAsFavourite(currency: Currency)
     suspend fun getAllCurrenciesThatContains(symbol: String): List<Currency>
     suspend fun subscribeToOneCurrency(currency: Currency)
-
+    suspend fun unSubscribeMultipleCurrencies(listCurrencies: List<Currency>)
+    suspend fun markSymbolAsNotFavourite(symbol: String)
 }

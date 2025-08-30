@@ -10,6 +10,7 @@ import com.vandrushko.core.domain.NotificationsRepositoryImpl
 import com.vandrushko.core.domain.notifications.usecase.CreateAndSaveLocalNotificationUseCase
 import com.vandrushko.core.domain.notifications.usecase.DeleteNotificationUseCase
 import com.vandrushko.core.domain.notifications.usecase.GetAllNotificationsUseCase
+import com.vandrushko.core.domain.notifications.usecase.NotificationAddedFlowUseCase
 import com.vandrushko.core.domain.notifications.usecase.SetNotificationAsViewedUseCase
 import com.vandrushko.core.domain.settings.SettingsRepository
 import com.vandrushko.core.domain.settings.SettingsRepositoryImpl
@@ -108,4 +109,9 @@ object CoreModule {
     @Singleton
     fun provideSetNotificationAsViewedUseCase(repository: NotificationsRepository): SetNotificationAsViewedUseCase =
         SetNotificationAsViewedUseCase(notificationsRepository = repository)
+
+    @Provides
+    @Singleton
+    fun provideNotificationAddedFlowUseCase(repository: NotificationsRepository): NotificationAddedFlowUseCase =
+        NotificationAddedFlowUseCase(notificationsRepository = repository)
 }

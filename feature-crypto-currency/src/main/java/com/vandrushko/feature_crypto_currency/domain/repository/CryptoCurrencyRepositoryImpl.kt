@@ -3,13 +3,15 @@ package com.vandrushko.feature_crypto_currency.domain.repository
 import com.vandrushko.core.domain.NotificationsRepository
 import com.vandrushko.core.domain.notifications.model.Notification
 import com.vandrushko.feature_crypto_currency.data.local.CurrencyDatabase
-import com.vandrushko.feature_crypto_currency.data.local.entity.CurrencyEntity
+import com.vandrushko.feature_crypto_currency.data.local.entity.CurrencyHistoryEntity
 import com.vandrushko.feature_crypto_currency.data.local.entity.toCurrency
+import com.vandrushko.feature_crypto_currency.data.local.entity.toCurrencyHistoryEntity
 import com.vandrushko.feature_crypto_currency.data.remote.rest.RestCurrencyMarkerApi
 import com.vandrushko.feature_crypto_currency.data.remote.rest.dto.toCurrencyEntity
 import com.vandrushko.feature_crypto_currency.data.remote.web_sockets.WebSocketCurrencyMarketApi
 import com.vandrushko.feature_crypto_currency.domain.model.Currency
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -31,18 +33,22 @@ class CryptoCurrencyRepositoryImpl(
 
             apiWebSockets.currencyFlow.collectLatest { entity ->
                 println("TTTTTTTTTTTTT $entity")
-                db.currencyDao.insertWithCleanup(entity)
+                db.currencyDao.upsertPreserveFavourite(entity)
+                db.currencyHistoryDao.insertWithCleanup(entity.toCurrencyHistoryEntity())
             }
         }
 
         scope.launch {
-            val message = "Price of BTC changed from: $${109.2442} to $${100.42424}\nDifference: 4%"
+            val message =
+                "Price of BTC changed from: $${109.2442} to $${100.42424}\nDifference: 4% THIS IS MOCK NOTIFICATION"
+
             repeat(3) {
                 notificationsRepository.saveNotificationLocally(
                     Notification(
                         message = message, timestamp = System.currentTimeMillis()
                     )
                 )
+                delay(25000)
             }
         }
     }
@@ -58,37 +64,39 @@ class CryptoCurrencyRepositoryImpl(
     }
 
     override suspend fun getAllBinanceCryptoCurrenciesAndSaveToDb() {
-        apiRest.getLastTickerSorted().onFailure {
+        apiRest.getLastTickerSorted()
+            .onFailure {
 
-        }.onSuccess {
-            db.currencyDao.insertAll(
-                it.map { it.toCurrencyEntity() })
-        }
+            }.onSuccess {
+
+                db.currencyDao.upsertAllPreserveFavourite(
+                    it.map { it.toCurrencyEntity() })
+            }
     }
 
     override suspend fun subscribeToOneCurrency(currency: Currency) {
-//        apiWebSockets.stopWebSocket()
-//        apiWebSockets.subscribeToSingle(currency.currencyName).collectLatest {
-//            db.currencyDao.insert(it)
-//        }
+
+    }
+
+    override suspend fun markSymbolAsNotFavourite(symbol: String) {
+        db.currencyDao.markSymbolAsNotFavourite(symbol)
+    }
+
+    override suspend fun unSubscribeMultipleCurrencies(listCurrencies: List<Currency>) {
+        apiWebSockets.unsubscribeSymbol(listCurrencies.map { it.currencyName.lowercase() })
     }
 
     override suspend fun subscribeMultipleCurrencies(listCurrencies: List<Currency>) {
-//        apiWebSockets.subscribeToSymbols(listCurrencies.map { it.currencyName }).collectLatest { entity ->
-//            entity.forEach {
-//                db.currencyDao.insertWithCleanup(it)
-//            }
-//        }
         apiWebSockets.subscribeSymbol(listCurrencies.map { it.currencyName.lowercase() })
-
     }
 
     override suspend fun watchCurrencyChanges(currency: Currency): Flow<List<Currency>> {
-        return db.currencyDao.getLast5MinutesFromOldest(currency.currencyName)
+        return db.currencyHistoryDao.getLast5MinutesFromOldest(currency.currencyName)
             .mapLatest { listOfEntities ->
                 checkForPriceDifference(listOfEntities, { old, last, percent ->
                     scope.launch {
-                        val message = "Price of ${old.symbol} changed from: $${old.lastPrice} to $${last.lastPrice}\nDifference: $percent%"
+                        val message =
+                            "Price of ${old.symbol} changed from: $${old.lastPrice} to $${last.lastPrice}\nDifference: $percent%"
                         notificationsRepository.saveNotificationLocally(
                             Notification(
                                 message = message, timestamp = System.currentTimeMillis()
@@ -103,8 +111,8 @@ class CryptoCurrencyRepositoryImpl(
     }
 
     private fun checkForPriceDifference(
-        list: List<CurrencyEntity>,
-        onDifferenceExceeded: (old: CurrencyEntity, last: CurrencyEntity, percent: Double) -> Unit
+        list: List<CurrencyHistoryEntity>,
+        onDifferenceExceeded: (old: CurrencyHistoryEntity, last: CurrencyHistoryEntity, percent: Double) -> Unit
     ) {
         if (list.size > 1) {
             val last = list.last()
