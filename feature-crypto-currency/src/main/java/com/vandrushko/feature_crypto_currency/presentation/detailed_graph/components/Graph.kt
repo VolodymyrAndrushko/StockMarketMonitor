@@ -3,6 +3,7 @@ package com.vandrushko.feature_crypto_currency.presentation.detailed_graph.compo
 import android.graphics.Color
 import android.widget.TextView
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,7 +26,7 @@ import com.vandrushko.feature_crypto_currency.R
 import com.vandrushko.feature_crypto_currency.domain.model.Currency
 
 @Composable
-fun LineChartView(currencies: List<Currency>) {
+fun LineChartView(currencies: List<Currency>, darkTheme: Boolean = isSystemInDarkTheme()) {
     val now = System.currentTimeMillis()
     val fiveMinutesAgo = now - 5 * 60 * 1000
 
@@ -38,6 +39,8 @@ fun LineChartView(currencies: List<Currency>) {
     }
     val noDataText = stringResource(R.string.no_graph_data_available)
 
+    val graphColor = if (darkTheme) Color.WHITE else Color.BLACK
+
     AndroidView(
         factory = { context ->
             LineChart(context).apply {
@@ -47,6 +50,9 @@ fun LineChartView(currencies: List<Currency>) {
                 setPinchZoom(true)
                 axisRight.isEnabled = false
                 xAxis.isEnabled = false
+                axisLeft.textColor = graphColor
+                xAxis.textColor = graphColor
+
                 marker = object : MarkerView(context, R.layout.marker_layout) {
                     private val tvY: TextView = findViewById(R.id.markerTextY)
                     private val tvX: TextView = findViewById(R.id.markerTextX)
@@ -75,8 +81,8 @@ fun LineChartView(currencies: List<Currency>) {
                 chart.axisLeft.axisMaximum = maxPrice + padding
 
                 val dataSet = LineDataSet(prices, "Price").apply {
-                    color = Color.BLACK
-                    valueTextColor = Color.BLACK
+                    color = graphColor
+                    valueTextColor = graphColor
                     lineWidth = 1f
                     setDrawCircles(false)
                     setDrawValues(false)
