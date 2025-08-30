@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vandrushko.feature_crypto_currency.R
 import com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen.components.CryptoCurrency
+import com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen.components.SortToggleButton
 import com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen.event.HomeScreenEvent
 import com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen.vm.HomeScreenViewModel
 import kotlinx.coroutines.flow.debounce
@@ -64,22 +66,34 @@ fun FindCryptoField(
                 onValueChange = { query = it },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(8.dp),
+                    .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
                 placeholder = {
                     Text(stringResource(R.string.search_currency))
                 },
+                suffix = {
+                    IconButton(
+                        onClick = {
+                            query = ""
+                        }) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear search",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
                 singleLine = true
             )
-            IconButton(
-                onClick = {
-                    query = ""
-                }) {
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = "Clear search",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+            SortToggleButton(
+                sortOption = state.sortOption,
+                onSortChange = {
+                    viewModel.emit(HomeScreenEvent.ChangeSortOption(it))
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 8.dp, end = 16.dp)
+                    .size(24.dp)
+            )
         }
 
         if (query.isNotBlank() && currencies.isNotEmpty()) {

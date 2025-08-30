@@ -8,6 +8,8 @@ import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.GetFavouriteCurrenciesUseCase
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.MarkCurrencyAsFavouriteUseCase
 import com.vandrushko.feature_crypto_currency.domain.crypto_currency_home_screen.usecase.SubscribeMultipleCryptoCurrenciesUseCase
+import com.vandrushko.feature_crypto_currency.domain.model.Currency
+import com.vandrushko.feature_crypto_currency.domain.model.SortOptions
 import com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen.event.HomeScreenEvent
 import com.vandrushko.feature_crypto_currency.presentation.crypto_currency_home_screen.state.HomeScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,7 +67,7 @@ class HomeScreenViewModel @Inject constructor(
             is HomeScreenEvent.EnterScreen -> {
                 viewModelScope.launch {
                     getAllTicker()
-
+                    delay(500)
                     subScribeMultiple(_state.value.favouriteCurrencies)
                 }
 
@@ -74,9 +76,8 @@ class HomeScreenViewModel @Inject constructor(
                     getFavouriteCurrenciesUseCase()
                         .sample(200)
                         .collectLatest { favourite ->
-                            _state.update {
-                                it.copy(favouriteCurrencies = favourite)
-                            }
+
+                            updateWithSort(_state.value.sortOption, favourite)
                         }
                 }
             }
@@ -84,6 +85,21 @@ class HomeScreenViewModel @Inject constructor(
             is HomeScreenEvent.StopWatch -> {
                 watchJob?.cancel()
             }
+
+            is HomeScreenEvent.ChangeSortOption -> {
+                updateWithSort(event.sort, _state.value.favouriteCurrencies)
+            }
+        }
+    }
+
+    private fun updateWithSort(sortOption: SortOptions, favourite: List<Currency>) {
+        val sortedList = when (sortOption) {
+            SortOptions.DEFAULT -> favourite
+            SortOptions.L_TO_H -> favourite.sortedBy { it.currentPrice }
+            SortOptions.H_TO_L -> favourite.sortedByDescending { it.currentPrice }
+        }
+        _state.update {
+            it.copy(favouriteCurrencies = sortedList, sortOption = sortOption)
         }
     }
 }
