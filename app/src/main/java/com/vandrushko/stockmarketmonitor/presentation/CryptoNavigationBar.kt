@@ -43,7 +43,7 @@ fun StockMarketNavigationBar(
                 tint = MaterialTheme.colorScheme.primary
             )
             Icon(
-                painter = painterResource(R.drawable.ic_notifications),
+                painter = painterResource(R.drawable.ic_notification_solid),
                 modifier = Modifier.clickable {
                     onNavigation(Notification)
                 },
