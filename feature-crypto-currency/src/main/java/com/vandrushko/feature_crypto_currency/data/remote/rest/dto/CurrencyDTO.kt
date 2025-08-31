@@ -9,7 +9,8 @@ data class CurrencyDTO(
     val lastPrice: Double,
     val priceChangePercent: Double,
     val priceChange: Double,
-    val quoteVolume: Double
+    val quoteVolume: Double,
+    val status: String? = null
 )
 
 fun CurrencyDTO.toCurrencyEntity(): CurrencyEntity =
