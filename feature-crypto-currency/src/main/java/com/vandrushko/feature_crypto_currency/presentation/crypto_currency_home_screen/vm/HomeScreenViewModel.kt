@@ -102,4 +102,9 @@ class HomeScreenViewModel @Inject constructor(
             it.copy(favouriteCurrencies = sortedList, sortOption = sortOption)
         }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        watchJob?.cancel()
+    }
 }

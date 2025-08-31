@@ -64,16 +64,22 @@ class DetailedGraphViewModel @Inject constructor(
 
         watchJob?.cancel()
         watchJob = viewModelScope.launch {
-            watchCurrencyHistory(currency).sample(_state.value.updatePeriod.millis)
+            watchCurrencyHistory(currency)
+                .sample(_state.value.updatePeriod.millis)
                 .collectLatest { currencies ->
                     if (currencies.isNotEmpty()) {
                         _state.update {
                             it.copy(
                                 currencies = currencies,
-                                lastCurrency = currencies.maxBy { it.timestamp })
+                                lastCurrency = currencies.maxByOrNull { it.timestamp })
                         }
                     }
                 }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        watchJob?.cancel()
     }
 }

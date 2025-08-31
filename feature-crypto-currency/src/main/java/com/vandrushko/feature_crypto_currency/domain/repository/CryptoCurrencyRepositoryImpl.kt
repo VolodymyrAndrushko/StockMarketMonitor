@@ -32,7 +32,6 @@ class CryptoCurrencyRepositoryImpl(
             apiWebSockets.startConnection()
 
             apiWebSockets.currencyFlow.collectLatest { entity ->
-                println("TTTTTTTTTTTTT $entity")
                 db.currencyDao.upsertPreserveFavourite(entity)
                 db.currencyHistoryDao.insertWithCleanup(entity.toCurrencyHistoryEntity())
             }

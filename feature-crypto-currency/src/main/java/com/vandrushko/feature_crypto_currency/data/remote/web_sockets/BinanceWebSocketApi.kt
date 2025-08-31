@@ -43,7 +43,6 @@ class WebSocketBinanceApi(
                 session?.incoming?.consumeEach { frame ->
                     when (frame) {
                         is Frame.Text -> {
-                            println("MiniTicker: Frame")
                             handleFrame(frame.readText())
                         }
 
